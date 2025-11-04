@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experience Zambales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* START DARK MODE STYLES */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1A202C; /* Very Dark Blue-Gray Background */
+            color: #E2E8F0; /* Light Gray Text Default */
+        }
+        
+        .text-accent { color: #5A67D8; } 
+        
+        .shadow-custom { box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4); } /* Darker shadow */
+
+        /* Hero Background - Now a darker gradient/flat color */
+        .minimal-bg {
+            background-color: #2D3748; /* Medium Dark Gray */
+        }
+
+        /* --- Custom Sidebar (Left Pop-out) CSS --- */
+        #hover-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px; 
+            z-index: 60; 
+            transform: translateX(-100%); 
+            transition: transform 0.4s ease-out; 
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.4);
+            background-color: #1A202C; /* Dark background */
+            padding-top: 5rem;
+        }
+        
+        /* The new visible trigger/handle */
+        #sidebar-handle {
+            position: fixed;
+            top: 50%; 
+            left: 0;
+            transform: translateY(-50%);
+            z-index: 70;
+            padding: 8px 6px;
+            background-color: #5A67D8; 
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            writing-mode: vertical-rl; 
+            text-orientation: mixed;
+            border-radius: 0 6px 6px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: background-color 0.2s ease-out;
+        }
+        
+        /* Show the sidebar when the handle is hovered */
+        #sidebar-handle:hover + #hover-sidebar,
+        #hover-sidebar:hover,
+        #hover-sidebar.active {
+            transform: translateX(0);
+        }
+
+        /* --- Background Video Styles --- */
+        .video-container {
+            position: relative;
+            overflow: hidden;
+            background-color: #000; /* Fallback color */
+        }
+        .video-background {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: 1;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+        .video-content {
+            position: relative;
+            z-index: 2; 
+            background-color: rgba(0, 0, 0, 0.65); /* Slightly lighter overlay for better contrast */
+            padding: 4rem 1.5rem; 
+            color: white; 
+        }
+        /* End Background Video Styles */
+
+
+        /* --- Carousel & Hover CSS (Updated for Dark Mode) --- */
+        .art-gallery {
+            display: flex;
+            overflow-x: auto; 
+            scroll-snap-type: x mandatory;
+            gap: 1.5rem; 
+            padding-bottom: 1rem;
+            scrollbar-width: thin; 
+            scrollbar-color: #5A67D8 #2D3748; 
+        }
+        .art-card {
+            flex-shrink: 0;
+            width: 280px; 
+            height: 350px;
+            position: relative;
+            overflow: hidden;
+            scroll-snap-align: start;
+        }
+        .art-card a {
+            display: block;
+            width: 100%;
+            height: 100%;
+            text-decoration: none; 
+            color: inherit; 
+            cursor: pointer;
+            border-radius: 0.75rem; 
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2); 
+        }
+
+        .art-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease-in-out;
+        }
+        .art-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.85); /* Slightly darker info overlay */
+            color: white;
+            padding: 1rem;
+            transform: translateY(100%); 
+            transition: transform 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; 
+            opacity: 0;
+        }
+
+        /* Hover effects applied to the anchor tag */
+        .art-card a:hover img {
+            transform: scale(1.05); 
+        }
+        .art-card a:hover .art-info {
+            transform: translateY(0); 
+            opacity: 1;
+        }
+        /* END DARK MODE STYLES */
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'accent': '#5A67D8', /* Primary Accent: Indigo/Periwinkle */
+                        'neutral-light': '#2D3748', /* Dark mode neutral background */
+                        'neutral-dark': '#4B5563', 
+                        'footer-bg': '#171923', /* Almost Black */
+                    }
+                }
+            }
+        }
+    </script>
+
+    <div id="sidebar-handle" class="hidden sm:block">MENU</div>
+
+    <div id="hover-sidebar" class="hidden sm:block">
+        <div class="px-6 py-4 border-b border-gray-700 flex items-center">
+            <h3 class="text-lg font-bold text-accent">Site Info</h3>
+        </div>
+        <nav class="space-y-3 px-6 py-6">
+            <h4 class="text-sm text-gray-500 font-medium pb-2 uppercase tracking-wider">Site Navigation</h4>
+            
+            <a href="references.html" class="block w-full text-left bg-gray-700 text-gray-200 font-medium hover:bg-accent hover:text-white p-3 rounded-lg transition-colors shadow-sm">
+                <span class="flex items-center">References
+                </span>
+            </a>
+        </nav>
+        
+        <div class="px-6 mt-8">
+            <h4 class="text-sm text-gray-500 font-medium pb-2 uppercase tracking-wider border-t border-gray-700 pt-4">Main Content</h4>
+            <nav class="space-y-2 text-sm">
+                <a href="#san-antonio" class="block text-gray-400 hover:text-accent transition-colors">San Antonio</a>
+                <a href="#san-marcelino" class="block text-gray-400 hover:text-accent transition-colors">San Marcelino</a>
+                <a href="#castillejos" class="block text-gray-400 hover:text-accent transition-colors">Castillejos</a>
+            </nav>
+        </div>
+    </div>
+
+    <header id="navbar" class="sticky top-0 z-50 shadow-custom bg-1A202C/95 backdrop-blur-sm border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-black text-accent hover:text-gray-400 transition-colors">
+                <a href="#hero">Sining ng Zambales</a>
+            </h1>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#san-antonio" class="text-gray-400 hover:text-accent transition-colors">San Antonio</a>
+                <a href="#san-marcelino" class="text-gray-400 hover:text-accent transition-colors">San Marcelino</a>
+                <a href="#castillejos" class="text-gray-400 hover:text-accent transition-colors">Castillejos</a>
+            </nav>
+            <button id="menu-button" class="md:hidden p-2 rounded-lg text-gray-200 hover:bg-gray-700 transition-colors" aria-label="Toggle Menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden px-4 pb-4 space-y-2 border-t border-gray-700 bg-1A202C">
+            <a href="#san-antonio" class="block py-2 text-gray-400 hover:text-accent transition-colors rounded-lg">San Antonio</a>
+            <a href="#san-marcelino" class="block py-2 text-gray-400 hover:text-accent transition-colors rounded-lg">San Marcelino</a>
+            <a href="#castillejos" class="block py-2 text-gray-400 hover:text-accent transition-colors rounded-lg">Castillejos</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="minimal-bg text-gray-200 py-20 sm:py-32 lg:py-40">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+                <h2 class="text-sm font-semibold uppercase tracking-widest text-gray-400 opacity-80 mb-3">Promoting the Art of Region III</h2>
+                <h1 class="text-5xl sm:text-7xl font-extrabold leading-tight mb-6">
+                    <span class="text-accent">Experience</span> <br class="hidden sm:inline">Zambales
+                </h1>
+                <p class="max-w-3xl mx-auto text-xl font-light mb-10 text-gray-400 opacity-90">
+                    Celebrate the rich craftsmanship and innovative artistry thriving of 
+				<br>
+					Castillejos, San Marcelino, and San Antonio.
+                </p>
+                <a href="#san-antonio" class="bg-accent text-white font-bold py-3 px-8 rounded-full text-lg shadow-xl hover:bg-neutral-dark transition-all transform hover:scale-105 inline-flex items-center">
+                    Discover the Arts
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+            </div>
+        </section>
+
+        <div class="md:flex max-w-7xl mx-auto">
+            
+            <div class="md:w-3/4 lg:w-4/5">
+                
+                <section id="san-antonio" class="py-16 sm:py-24 video-container">
+                    <video autoplay loop muted playsinline class="video-background">
+                        <source src="https://assets.mixkit.co/videos/preview/mixkit-seashore-in-the-sunset-4061-large.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="video-content px-6 lg:px-8">
+                        <div class="mb-16">
+                            <span class="text-accent font-bold text-sm uppercase tracking-wider">Zambales</span>
+                            <h2 class="text-4xl font-extrabold mt-2 text-white">San Antonio</h2>
+                            <p class="mt-4 text-xl text-gray-300 max-w-3xl"> Is a Second Class Municipality becoming the crown jewel of tourism in Zambales and Region III.</p>
+                        </div>
+                        
+                        <div class="art-gallery mb-12">
+                            <div class="art-card">
+                                <a href="san-antonio-music.html">
+                                    <img src="Casa.jpg" alt="Classical music violin training" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Casa San Miguel</h4>
+                                        <p class="text-sm mt-1">It serves as a hub for arts education and community development, featuring a music school, art residency programs, and a museum.</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="art-card">
+                                <a href="san-antonio-visual-arts.html">
+                                    <img src="Zambulat.jfif" alt="Visual arts painting" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Zambulat Fetival</h4>
+                                        <p class="text-sm mt-1">It features live concerts from local bands, art exhibits, a trade fair of Zambales-based products, and various activities like kite making and mural painting.</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="art-card">
+                                <a href="san-antonio-sculpture.html">
+                                    <img src="Zaniel.jpg" alt="Sculpture by local artists" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Zaniel Mariano</h4>
+                                        <p class="text-sm mt-1">Mariano, who hails from San Antonio, Zambales, is a self taught artist and began his career in painting at the age of 16.</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="art-card">
+                                <a href="san-antonio-photography.html">
+                                    <img src="Elmer.png" alt="Nature photography of coves" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Elmer Borlongan</h4>
+                                        <p class="text-sm mt-1">Elmer Borlongan is a contemporary Philippine painter. He is  one of the CCP Thirteen Artists Awardees. He and his artist-wife, Plet C. Bolipata, live in San Antonio, Zambales.</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="art-card">
+                                <a href="san-antonio-dance.html">
+                                    <img src="Pundaquit.jpg" alt="Modern dance performance" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Pundaquit Festival</h4>
+                                        <p class="text-sm mt-1">The Pundaquit Festival is an annual community arts program by CASA San Miguel in San Antonio, Zambales, that fosters local arts through residencies, performances, workshops, and exhibits.</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="art-card">
+                                <a href="san-antonio-writing.html">
+                                    <img src="Coke.jpg" alt="Creative writing and poetry" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Alfonso Coke Bolipata</h4>
+                                        <p class="text-sm mt-1">Alfonso "Coke" Bolipataa is a highly acclaimed Filipino violinist. He is also a teacher, writer, administrator, and founder of Casa San Miguel in San Antonio, Zambales.</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="san-marcelino" class="py-16 sm:py-24 video-container">
+                    <video autoplay loop muted playsinline class="video-background">
+                        <source src="https://assets.mixkit.co/videos/preview/mixkit-yellow-and-orange-color-palette-35805-large.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="video-content px-6 lg:px-8">
+                        <div class="mb-16">
+                            <span class="text-accent font-bold text-sm uppercase tracking-wider">Zambales</span>
+                            <h2 class="text-4xl font-extrabold mt-2 text-white">San Marcelino</h2>
+                            <p class="mt-4 text-xl text-gray-300 max-w-3xl">Vibrant community arts celebrating the town's agricultural pride.</p>
+                        </div>
+
+                        <div class="art-gallery mb-12">
+                            <div class="art-card">
+                                <a href="san-marcelino-dancing.html">
+                                    <img src="Singkamas.jpg" alt="Singkamas Festival Street Dancing" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Singkamas Fesstival</h4>
+                                        <p class="text-sm mt-1">The Singkamas Festival is a week-long celebration in San Marcelino, Zambales, that honors the region's abundant harvest of singkamas (jicama).</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="art-card">
+                                <a href="san-marcelino-agri-art.html">
+                                    <img src="Ico.jpg" alt="Agricultural art using produce" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Ricarte Ico</h4>
+                                        <p class="text-sm mt-1">"Ricarte Ico" is one of the contemporary artist known for his Neo-Cubism art, who sometimes goes by the name "RicARTE".</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="art-card">
+                                <a href="san-marcelino-basketry.html">
+                                    <img src="Weaving.jpg" alt="Rattan basket weaving" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Weaving & Basketry</h4>
+                                        <p class="text-sm mt-1">Traditional utility and decorative items crafted from bamboo and rattan. Weaving is the general art of intertwining threads to make fabric, while basketry is the more specific craft of weaving pliable materials like grasses, reeds, or twigs to create three-dimensional objects like baskets, mats, and even furniture.</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="castillejos" class="py-16 sm:py-24 video-container">
+                    <video autoplay loop muted playsinline class="video-background">
+                        <source src="https://assets.mixkit.co/videos/preview/mixkit-sunlight-through-the-tree-leaves-1051-large.mp4" type="video/mp4">
+                        Your browser does support the video tag.
+                    </video>
+                    <div class="video-content px-6 lg:px-8">
+                        <div class="mb-16">
+                            <span class="text-accent font-bold text-sm uppercase tracking-wider">Zambales</span>
+                            <h2 class="text-4xl font-extrabold mt-2 text-white">Castillejos</h2>
+                            <p class="mt-4 text-xl text-gray-300 max-w-3xl">The artistic legacy of leadership and public service preserved through historical artifacts.</p>
+                        </div>
+
+                        <div class="art-gallery mb-12">
+                            <div class="art-card">
+                                <a href="castillejos-architecture.html">
+                                    <img src="Ramon.jpg" alt="Ramon Magsaysay Ancestral House" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Ramon Magsaysay Ancestral House</h4>
+                                        <p class="text-sm mt-1">The Ramon Magsaysay Ancestral House is a museum and ancestral home in Castillejos, Zambales, that served as the childhood home of the late Philippine President Ramon Magsaysay.</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="art-card">
+                                <a href="castillejos-archival.html">
+                                    <img src="Sioson.jpg" alt="Historical documents and archives" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Mark Ronald Sioson</h4>
+                                        <p class="text-sm mt-1">Born in the modest town of Castillejos, located in the heart of Zambales Province, he is a self-taught artist who fuses his works with the concept of realism.</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="art-card">
+                                <a href="castillejos-portraiture.html">
+                                    <img src="Suman.jpg" alt="Portraiture of Ramon Magsaysay" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Suman Ibos Festival</h4>
+                                        <p class="text-sm mt-1">The Suman Ibos Festival is a celebration in honor of the traditional Filipino delicacy, suman sa ibos, a sticky rice cake wrapped in buli leaves.</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="art-card">
+                                <a href="castillejos-curatorial.html">
+                                    <img src="Bamboo.jpg" alt="Museum exhibit design" loading="lazy">
+                                    <div class="art-info">
+                                        <h4 class="text-xl font-bold">Bamboo Art</h4>
+                                        <p class="text-sm mt-1">Bamboo art is the practice of creating objects and artworks from the versatile and abundant plant, bamboo.</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="py-16 bg-neutral-light px-6 lg:px-8 text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-4 text-gray-200">Experience the Fusion of Culture and Nature</h2>
+                    <p class="text-xl font-light mb-8 opacity-90 text-gray-400">
+                        From the vibrant Singkamas harvest to the classical symphonies of Casa San Miguel, Zambales invites you to witness art in every form.
+                    </p>
+                    <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' });" class="bg-accent text-white font-bold py-3 px-8 rounded-full text-lg shadow-xl hover:bg-neutral-dark transition-all transform hover:scale-105">
+                        Start Your Cultural Journey
+                    </button>
+                </section>
+            </div> 
+        </main>
+
+    <footer class="bg-footer-bg text-white py-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div>
+                <h4 class="text-lg font-bold text-accent mb-4">Quick Links</h4>
+                <ul class="space-y-2 text-gray-400 text-sm">
+                    <li><a href="#san-antonio" class="hover:text-white transition-colors">San Antonio</a></li>
+                    <li><a href="#san-marcelino" class="hover:text-white transition-colors">San Marcelino</a></li>
+                    <li><a href="#castillejos" class="hover:text-white transition-colors">Castillejos</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2 class="text-lg font-bold text-accent mb-4">In Partial Fulfillment of the Requirements for the Subject Contemporary Philippine Arts from the Regions</h2>
+            </div>
+            
+            <div class="col-span-2 space-y-4">
+                <p class="text-gray-400 text-sm">
+					Made by Andrada and Marasigan
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        // --- 1. Sidebar Toggle Logic (Handle Click/Hover) ---
+        const sidebar = document.getElementById('hover-sidebar');
+        const sidebarHandle = document.getElementById('sidebar-handle');
+
+        // Combined logic for showing/hiding on non-touch devices (hover)
+        sidebarHandle.addEventListener('mouseenter', () => {
+             // Only show on hover if not mobile/touch (simplistic check for example)
+            if (window.innerWidth >= 640) { 
+                sidebar.classList.add('active');
+            }
+        });
+        
+        sidebar.addEventListener('mouseleave', () => {
+            if (window.innerWidth >= 640) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Click to toggle logic (better for touch/mobile or as an alternative)
+        sidebarHandle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+
+        // --- 2. Mobile Nav Menu Toggle ---
+        document.getElementById('menu-button').addEventListener('click', () => {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // --- 3. Smooth Scroll with Sticky Header Offset ---
+        const allLinks = document.querySelectorAll('a[href^="#"]');
+        const navbar = document.getElementById('navbar');
+
+        allLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.getAttribute('href').length > 1) {
+                    e.preventDefault();
+                    
+                    // Close all menus upon clicking a main content link
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                    sidebar.classList.remove('active');
+
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        const navbarHeight = navbar.offsetHeight;
+                        const topPosition = targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight - 20;
+                        
+                        window.scrollTo({
+                            top: topPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+
+        // --- 4. Active Navigation with Intersection Observer ---
+        const sections = document.querySelectorAll('section[id]');
+        const navLinksDesktop = document.querySelectorAll('#navbar nav a');
+        const navLinksMobile = document.querySelectorAll('#mobile-menu a');
+
+        const options = {
+            root: null, 
+            rootMargin: '-10% 0px -70% 0px', 
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const currentId = entry.target.id;
+
+                    const removeActive = (links) => {
+                        links.forEach(link => {
+                            link.classList.remove('text-accent', 'font-bold');
+                            link.classList.add('text-gray-400'); // Changed text-gray-600 to text-gray-400 for dark mode
+                        });
+                    };
+
+                    const addActive = (links, id) => {
+                        links.forEach(link => {
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.remove('text-gray-400');
+                                link.classList.add('text-accent', 'font-bold');
+                            }
+                        });
+                    };
+
+                    removeActive(navLinksDesktop);
+                    addActive(navLinksDesktop, currentId);
+                    removeActive(navLinksMobile);
+                    addActive(navLinksMobile, currentId);
+                }
+            });
+        }, options);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+    </script>
+    </body>
+</html>
